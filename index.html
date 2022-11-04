@@ -37,27 +37,10 @@
     <script src="js/csv_to_html_table.js"></script>
 
     <script>
-        function format_link(link) {
-            if (link)
-                return "<a href='" + link + "' target='_blank'>" + link + "</a>";
-            else return "";
-        }
-
-        CsvToHtmlTable.init({
-            csv_path: "data/overview_test.csv",
-            element: "table-container",
-            allow_download: false,
-            csv_options: {
-                separator: ",",
-                delimiter: '"'
-            },
-            datatables_options: {
-                paging: true
-            },
-            custom_formatting: [
-                [2, format_link]
-            ]
-        });
+        let rawdata = fs.readFileSync('data/overview.json');
+        let overview = JSON.parse(rawdata)
+        var jsonHtmlTable = ConvertJsonToTable(overview, 'jsonTable', null, 'Download');
+        document.write(jsonHtmlTable);
     </script>
 </body>
 
