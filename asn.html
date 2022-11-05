@@ -8,21 +8,12 @@
 </head>
 <body>
     <script>
-    function getParams() {
-        var idx = document.URL.indexOf('?');
-        var params = new Array();
-        if (idx != -1) {
-        var pairs = document.URL.substring(idx+1, document.URL.length).split('&');
-        for (var i=0; i<pairs.length; i++) {
-        nameVal = pairs[i].split('=');
-        params[nameVal[0]] = nameVal[1];
-           }
-        }
-        return params;
-        }
-        params = getParams();
-
-        document.write("<h1>" + params.toString() + "</h1>")
+        const queryString = window.location.search;
+        console.log(queryString)
+        var number = queryString.substring(queryString.indexOf('=') + 1)
+        document.write("<h1>")
+        document.write(number.toString())
+        document.write("</h1>")
     </script>
 </body>
 </html>
