@@ -57,7 +57,9 @@
         columns: null,
         headRowSelector: 'thead tr', // or e.g. tr:first-child
         bodyRowSelector: 'tbody tr',
-        headRowClass: null
+        headRowClass: null,
+        copyHeaderAlignment: true,
+        copyHeaderClass: false
       },
       inputs: {
         queries: null,
@@ -80,10 +82,11 @@
         paginationGap: [1,2,2,1],
         searchTarget: null,
         searchPlacement: 'before',
-        searchPlaceholder: 'Search',
+        searchText: 'Search: ',
         perPageTarget: null,
         perPagePlacement: 'before',
         perPageText: 'Show: ',
+        pageText: 'Pages: ',
         recordCountPageBoundTemplate: '{pageLowerBound} to {pageUpperBound} of',
         recordCountPageUnboundedTemplate: '{recordsShown} of',
         recordCountTotalTemplate: '{recordsQueryCount} {collectionName}',
@@ -107,7 +110,7 @@
         perPageDefault: 10,
         perPageOptions: [10,20,50,100],
         sorts: {},
-        sortsKeys: null,
+        sortsKeys: [],
         sortTypes: {},
         records: null
       },
@@ -197,7 +200,7 @@
   
       this.$element.trigger('dynatable:init', this);
   
-      if (!this.settings.dataset.ajax || (this.settings.dataset.ajax && this.settings.dataset.ajaxOnLoad) || this.settings.features.paginate) {
+      if (!this.settings.dataset.ajax || (this.settings.dataset.ajax && this.settings.dataset.ajaxOnLoad) || this.settings.features.paginate || (this.settings.features.sort && !$.isEmptyObject(this.settings.dataset.sorts))) {
         this.process();
       }
     };
@@ -308,6 +311,10 @@
         }
   
         td += '"';
+      }
+  
+      if (column.cssClass) {
+        td += ' class="' + column.cssClass + '"';
       }
   
       return td + '>' + html + '</td>';
@@ -464,7 +471,8 @@
           attributeReader: settings.readers[id] || settings.readers._attributeReader,
           sorts: sorts,
           hidden: $column.css('display') === 'none',
-          textAlign: $column.css('text-align')
+          textAlign: settings.table.copyHeaderAlignment && $column.css('text-align'),
+          cssClass: settings.table.copyHeaderClass && $column.attr('class')
         });
   
         // Modify header cell
@@ -719,7 +727,7 @@
               recordsShown: obj.records.count(),
               recordsQueryCount: settings.dataset.queryRecordCount,
               recordsTotal: settings.dataset.totalRecordCount,
-              collectionName: settings.params.records,
+              collectionName: settings.params.records === "_root" ? "records" : settings.params.records,
               text: settings.inputs.recordCountText
             };
   
@@ -893,14 +901,19 @@
   
       this.init = function() {
         var sortsUrl = window.location.search.match(new RegExp(settings.params.sorts + '[^&=]*=[^&]*', 'g'));
-        settings.dataset.sorts = sortsUrl ? utility.deserialize(sortsUrl)[settings.params.sorts] : {};
-        settings.dataset.sortsKeys = sortsUrl ? utility.keysFromObject(settings.dataset.sorts) : [];
+        if (sortsUrl) {
+          settings.dataset.sorts = utility.deserialize(sortsUrl)[settings.params.sorts];
+        }
+        if (!settings.dataset.sortsKeys.length) {
+          settings.dataset.sortsKeys = utility.keysFromObject(settings.dataset.sorts);
+        }
       };
   
       this.add = function(attr, direction) {
         var sortsKeys = settings.dataset.sortsKeys,
             index = $.inArray(attr, sortsKeys);
         settings.dataset.sorts[attr] = direction;
+        obj.$element.trigger('dynatable:sorts:added', [attr, direction]);
         if (index === -1) { sortsKeys.push(attr); }
         return dt;
       };
@@ -909,6 +922,7 @@
         var sortsKeys = settings.dataset.sortsKeys,
             index = $.inArray(attr, sortsKeys);
         delete settings.dataset.sorts[attr];
+        obj.$element.trigger('dynatable:sorts:removed', attr);
         if (index !== -1) { sortsKeys.splice(index, 1); }
         return dt;
       };
@@ -916,6 +930,7 @@
       this.clear = function() {
         settings.dataset.sorts = {};
         settings.dataset.sortsKeys.length = 0;
+        obj.$element.trigger('dynatable:sorts:cleared');
       };
   
       // Try to intelligently guess which sort function to use
@@ -1110,11 +1125,13 @@
           settings.dataset.page = 1;
         }
         settings.dataset.queries[name] = value;
+        obj.$element.trigger('dynatable:queries:added', [name, value]);
         return dt;
       };
   
       this.remove = function(name) {
         delete settings.dataset.queries[name];
+        obj.$element.trigger('dynatable:queries:removed', name);
         return dt;
       };
   
@@ -1225,41 +1242,19 @@
       this.create = function() {
         var $search = $('<input />', {
               type: 'search',
-              placeholder: settings.inputs.searchPlaceholder,
               id: 'dynatable-query-search-' + obj.element.id,
               'data-dynatable-query': 'search',
               value: settings.dataset.queries.search
             }),
-            $searchCancel = $('<span></span>', {
-              'class': 'dynatable-search-clear',
-              html: '&#x2716;'
-            }),
             $searchSpan = $('<span></span>', {
               id: 'dynatable-search-' + obj.element.id,
               'class': 'dynatable-search',
-              text: 'Search: '
-            }).append($search).append($searchCancel);
-  
-        if ($search.val() !== "") {
-          $searchSpan.addClass('dynatable-search-with-clear');
-        }
-  
-        $searchCancel.bind('click', function(e) {
-          $search.val('').focus();
-          obj.queries.runSearch('');
-          $searchSpan.removeClass('dynatable-search-with-clear');
-        });
+              text: settings.inputs.searchText
+            }).append($search);
   
         $search
           .bind(settings.inputs.queryEvent, function() {
             obj.queries.runSearch($(this).val());
-          })
-          .bind('keyup', function(e) {
-            if ($search.val()==="") {
-              $searchSpan.removeClass('dynatable-search-with-clear');
-            } else {
-              $searchSpan.addClass('dynatable-search-with-clear');
-            }
           })
           .bind('keypress', function(e) {
             if (e.which == 13) {
@@ -1295,7 +1290,9 @@
       };
   
       this.set = function(page) {
-        settings.dataset.page = parseInt(page, 10);
+        var newPage = parseInt(page, 10);
+        settings.dataset.page = newPage;
+        obj.$element.trigger('dynatable:page:set', newPage);
       }
     };
   
@@ -1353,8 +1350,10 @@
       };
   
       this.set = function(number, skipResetPage) {
+        var newPerPage = parseInt(number);
         if (!skipResetPage) { obj.paginationPage.set(1); }
-        settings.dataset.perPage = parseInt(number);
+        settings.dataset.perPage = newPerPage;
+        obj.$element.trigger('dynatable:perPage:set', newPerPage);
       };
     };
   
@@ -1384,7 +1383,7 @@
               (pages + 1) - settings.inputs.paginationGap[3]
             ];
   
-        pageLinks += '<li><span>Pages: </span></li>';
+        pageLinks += '<li><span>' + settings.inputs.pageText + '</span></li>';
   
         for (var i = 1; i <= pages; i++) {
           if ( (i > breaks[0] && i < breaks[1]) || (i > breaks[2] && i < breaks[3])) {
@@ -1608,7 +1607,7 @@
             }
           }
         }
-        return decodeURI($.param(urlOptions));
+        return $.param(urlOptions);
       },
       // Get array of keys from object
       // see http://stackoverflow.com/questions/208016/how-to-list-the-properties-of-a-javascript-object/208020#208020
