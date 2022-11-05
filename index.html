@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
         crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
 </head>
 
 <body>
@@ -29,19 +31,33 @@
             </div>
         </footer>
     </div>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.2.1/js/bootstrap.bundle.min.js"></script>
-    <script src="js/jquery.csv.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
-    <script src="js/csv_to_html_table.js"></script>
+    <link rel="stylesheet" media="all" href="https://s3.amazonaws.com/dynatable-docs-assets/css/jquery.dynatable.css" />
 
-    <script>
-        let rawdata = fs.readFileSync('data/overview.json');
-        let overview = JSON.parse(rawdata)
-        var jsonHtmlTable = ConvertJsonToTable(overview, 'jsonTable', null, 'Download');
-        document.write(jsonHtmlTable);
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.js"></script>
+    <script src="js/dynatable.js"></script>
+        <!-- TABLE CONSTRUCTION-->
+            <!-- HEADING FORMATION -->  
+            <script>
+                $.getJSON('data/overview.json', function (response) {
+  $('#my-table').dynatable({
+  dataset: {
+    records: response
+  },
+
+});
+});
+     </script>
+     <div>
+        <table id="my-table" class="table table-striped table-bordered">
+            <thead>
+                <th>Rank</th>
+                <th>ASN</th>
+                <th data-dynatable-column="organization">Organization</th>
+                <th data-dynatable-column="ratio">ROV-Ratio</th>
+            </thead>
+        <tbody>
+        </tbody>
+        </table>
 </body>
 
 </html>
