@@ -45,7 +45,7 @@
         <!-- TABLE CONSTRUCTION-->
             <!-- HEADING FORMATION -->  
             <script>
-                $.getJSON('data/overview.json', function (response) {
+                $.getJSON('data/json_with_hyperlink.json', function (response) {
   $('#my-table').dynatable({
   dataset: {
     records: response
@@ -60,16 +60,16 @@
                 <th>Rank</th>
                 <th>ASN</th>
                 <th data-dynatable-column="organization">Organization</th>
-                <th data-dynatable-column="ratio">ROV-Ratio</th>
+                <th data-dynatable-column="ratio">ROV-Percentage</th>
             </thead>
         <tbody>
         </tbody>
         </table>
         <script>
             $('#nmbUpdate').bind('click', function() {
-                    my(number);
+                asn_details(number);
 });
-function my(number)
+function asn_details(number)
 {
     console.log("hello" + number)
     var url = "asn.html" + "?" + "number=" + number.toString()
