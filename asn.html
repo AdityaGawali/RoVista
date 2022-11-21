@@ -27,5 +27,145 @@
         document.write(number.toString())
         document.write("</h1>")
     </script>
+    
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/series-label.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+    <figure class="highcharts-figure">
+    <div id="container"></div>
+    <p class="highcharts-description">
+        Chart showing data loaded dynamically. The individual data points can
+        be clicked to display more information.
+    </p>
+    </figure>
+
+    <script>
+
+Highcharts.chart('container', {
+
+    chart: {
+    scrollablePlotArea: {
+        minWidth: 700
+    }
+    },
+
+    data: {
+        csvURL: './data/asn/'+number+'.csv',
+        beforeParse: function (csv) {
+        return csv.replace(/\n\n/g, '\n');
+
+    }
+    },
+
+    title: {
+    text: 'ROV% of'+number
+    },
+
+    // subtitle: {
+    //   text: 'Source: Google Analytics'
+    // },
+
+    xAxis: {
+    //   tickInterval: 7 * 24 * 3600 * 1000, // one week
+    title: {
+            text: "Date"
+        },
+        tickWidth: 0,
+        gridLineWidth: 1,
+        labels: {
+            align: 'left',
+            x: 3,
+            y: -3
+        }
+    },
+
+    yAxis: [{ // left y axis
+        title: {
+            // text: null
+        },
+        labels: {
+            align: 'left',
+            x: 3,
+            y: 16,
+            format: '{value:.,0f}'
+        },
+        showFirstLabel: false
+        }, 
+        // { 
+        //     gridLineWidth: 0,
+        //     opposite: true,
+        //     max: 1,
+        //     min: 0,
+        //     title: {
+        //         text: "ROV Ratio (%)"
+        //     },
+        //     labels: {
+        //         align: 'right',
+        //         x: -3,
+        //         y: 16,
+        //         format: '{value:.,0f}'
+        //     },
+        // }
+    ],
+
+    legend: {
+    align: 'left',
+    verticalAlign: 'top',
+    borderWidth: 0
+    },
+
+    tooltip: {
+    shared: true,
+    crosshairs: true
+    },
+
+    plotOptions: {
+    series: {
+        allowPointSelect: true,
+
+        // cursor: 'pointer',
+        // className: 'popup-on-click',
+        marker: {
+        lineWidth: 1
+        }
+    }
+    },
+
+    series: [{ 
+        // visible:false
+
+        //     name: "Total",
+        //     type: 'line',
+        //     yAxis: 0,
+        //     lineWidth: 3,
+        //     marker: {
+        //         radius: 3
+        //     }
+        },
+        { 
+            visible:false
+
+            //     name: "Ratio",
+            // type: 'line',
+            // yAxis: 1,
+            // marker: {
+            //     radius: 3
+            // }
+        },
+    {
+            visible:false
+        },
+    {
+            visible:false
+        }
+    ]
+    });
+
+</script>
+
 </body>
 </html>
