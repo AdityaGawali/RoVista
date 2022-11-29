@@ -23,9 +23,10 @@
 <body>
     <div id="header"></div>
     <script>
-        document.write("<h1>")
-        document.write(number.toString())
-        document.write("</h1>")
+        // document.write("<h4>")
+        // document.write("AS number: ")
+        // document.write(number.toString())
+        // document.write("</h4>")
     </script>
     
     <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -37,7 +38,7 @@
 
     <figure class="highcharts-figure">
     <div id="container"></div>
-    <p class="highcharts-description">
+    <p class="highcharts-description"><small>
         Chart showing data loaded dynamically. The individual data points can
         be clicked to display more information.
     </p>
@@ -62,7 +63,7 @@ Highcharts.chart('container', {
     },
 
     title: {
-    text: 'ROV% of'+number
+    text: 'ROV% of '+number
     },
 
     // subtitle: {
@@ -166,6 +167,74 @@ Highcharts.chart('container', {
     });
 
 </script>
+
+<script>
+    function show() {
+        document.getElementById("toggleVisibilityButton").addEventListener("click", function(submit) {    
+        // document.getElementById("displaytable").style.display = "table";
+
+        if (document.getElementById("displaytable").style.display === "none") 		     
+            document.getElementById("displaytable").style.display = "table";
+        else document.getElementById("displaytable").style.display = "none"; 
+        document.getElementById('date1').innerHTML = document.getElementById("date 1").value
+        document.getElementById('date2').innerHTML = document.getElementById("date 2").value
+
+});
+    }
+</script>
+
+<h5>    Show diff data between Date 1 & Date 2</h5>
+
+<form>
+    <label for="date 1">Date 1:</label>
+    <input type="date" id="date 1" name="date1">
+    <label for="date 2">Date 2:</label>
+    <input type="date" id="date 2" name="date2">
+</form>
+
+
+<style>
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 50%;
+    }
+    
+    td, th {
+      /* border: 1px solid #dddddd; */
+      text-align: center;
+      padding: 2px;
+    }
+    
+    tr:nth-child(1) {
+      background-color: #ADD8E6;
+    }
+</style>
+
+<input id="toggleVisibilityButton" type="submit" onclick="show();">
+<table  id="displaytable" style="display:none" width="100%" cellpadding="1" cellspacing="0" border="1">
+    <tr align="center">
+        <td class="lbl"><b>Dates</b></td>
+        <td class="lbl"><b>AS nos. diff</b></td>
+    </tr>
+    <tr>
+        <td align="center"><span id='date1'></span></td>
+        <td align="center">1, 2, 3, 4</td>
+        </tr>
+        <tr>
+        <td align="center"><span id='date2'></span></td>
+        <td align="center">3, 4, 5, 6</td>
+    </tr>
+</table> 
+
+<style>
+    h6 {
+      /* font-family: arial, sans-serif; */
+      padding: 20px;
+    }
+</style>
+<!-- <h5>Feedback form</h5> -->
+<h6><a href="https://www.google.com/"><i>Give your feedback here!</i></a></h6>
 
 </body>
 </html>
