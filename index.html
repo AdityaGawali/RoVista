@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
     <!-- <link rel="stylesheet" href="css/style.css"> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.js"></script>
+    <link rel="stylesheet" media="all" href="https://s3.amazonaws.com/dynatable-docs-assets/css/jquery.dynatable.css" />
 
    <script>
     $(function(){
@@ -36,7 +37,6 @@
             </div>
         </footer>
     </div>
-    <link rel="stylesheet" media="all" href="https://s3.amazonaws.com/dynatable-docs-assets/css/jquery.dynatable.css" />
     <!-- <link rel="stylesheet" media="all" href="/css/jquery_dynatable.css"/> -->
 
 
@@ -45,12 +45,11 @@
         <!-- TABLE CONSTRUCTION-->
             <!-- HEADING FORMATION -->  
             <script>
-                $.getJSON('data/overview.json', function (response) {
+                $.getJSON('data/json_with_hyperlink.json', function (response) {
   $('#my-table').dynatable({
   dataset: {
     records: response
   },
-
 });
 });
      </script>
@@ -60,8 +59,8 @@
                 <th>Rank</th>
                 <th>ASN</th>
                 <th data-dynatable-column="org_name">Organization</th>
-                <th data-dynatable-column="ratio">ROV-Percentage</th>
                 <th data-dynatable-column="Country">Country</th>
+                <th data-dynatable-column="ratio">ROV-Percentage</th>
             </thead>
         <tbody>
         </tbody>
